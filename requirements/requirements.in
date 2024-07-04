@@ -1,0 +1,23 @@
+boto3
+docutils
+Django
+django-allauth
+django-allauth-2fa
+django-waffle
+psycopg2-binary
+django-environ
+djangorestframework
+drf-spectacular
+stripe
+dj-stripe
+django-anymail[mailgun]  # email services
+django-hijack
+django-storages
+celery-progress
+celery
+celery[redis]
+mailchimp3
+markdown
+openai
+sentry-sdk
+whitenoise[brotli]

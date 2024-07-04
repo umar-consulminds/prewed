@@ -1,0 +1,62 @@
+
+databases:
+- engine: PG
+  name: aiction-reaiction-db
+  num_nodes: 1
+  size: db-s-dev-database
+  version: "12"
+- cluster_name: aiction-reaiction-redis
+  engine: REDIS
+  name: aiction-reaiction-redis
+  production: true
+  version: "7"
+name: aiction-reaiction
+region: nyc
+services:
+- dockerfile_path: Dockerfile.web
+  envs:
+  - key: DATABASE_URL
+    scope: RUN_TIME
+    value: ${aiction-reaiction-db.DATABASE_URL}
+  - key: DJANGO_SETTINGS_MODULE
+    scope: RUN_AND_BUILD_TIME
+    value: aiction_reaiction.settings_production
+  - key: SECRET_KEY
+    scope: RUN_AND_BUILD_TIME
+    value: 'SkaSBFLjHgIwffIHlPDRzCfEbWaGGOvocHXYQZArRUvjvmcbNupRYvCuoMFo'
+  - key: REDIS_URL
+    scope: RUN_TIME
+    value: ${aiction-reaiction-redis.DATABASE_URL}
+  github:
+    branch: main
+    deploy_on_push: true
+    repo: user/aiction-reaiction
+  http_port: 8080
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  name: aiction-reaiction-web
+  routes:
+  - path: /
+workers:
+- dockerfile_path: Dockerfile.web
+  envs:
+  - key: DATABASE_URL
+    scope: RUN_TIME
+    value: ${aiction-reaiction-db.DATABASE_URL}
+  - key: DJANGO_SETTINGS_MODULE
+    scope: RUN_AND_BUILD_TIME
+    value: aiction_reaiction.settings_production
+  - key: SECRET_KEY
+    scope: RUN_AND_BUILD_TIME
+    value: 'SkaSBFLjHgIwffIHlPDRzCfEbWaGGOvocHXYQZArRUvjvmcbNupRYvCuoMFo'
+  - key: REDIS_URL
+    scope: RUN_TIME
+    value: ${aiction-reaiction-redis.DATABASE_URL}
+  github:
+    branch: main
+    deploy_on_push: true
+    repo: user/aiction-reaiction
+  instance_count: 1
+  instance_size_slug: basic-xs
+  name: aiction-reaiction-celery
+  run_command: celery -A aiction_reaiction worker -l INFO --pool=gevent --concurrency 2
